@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import rclpy.executors
 import sys
 import socket
 import numpy as np
@@ -11,6 +12,7 @@ import xml.etree.ElementTree as ET
 import errno
 import rclpy
 from std_msgs.msg import String
+import threading
 
 
 def create_rsi_xml_rob(act_joint_pos, setpoint_joint_pos, timeout_count, ipoc):
@@ -101,6 +103,11 @@ def main(args=None):
 
     node = rclpy.create_node(node_name)
 
+    executor = rclpy.executors.MultiThreadedExecutor()
+    executor.add_node(node)
+    executor_thread = threading.Thread(target=executor.spin, daemon=True)
+    executor_thread.start()
+
     node.get_logger().info(f"Started '{node_name}'")
 
     rsi_act_pub = node.create_publisher(String, "~/rsi/state", 1)
@@ -129,7 +136,6 @@ def main(args=None):
             des_joint_correction_absolute, ipoc_recv = parse_rsi_xml_sen(recv_msg)
             act_joint_pos = cmd_joint_pos + des_joint_correction_absolute
             ipoc += 1
-            rclpy.spin_once(node)
             time.sleep(cycle_time / 2)
         except socket.timeout:
             node.get_logger().warn(f"[{node_name}] Socket timed out.")
@@ -139,6 +145,7 @@ def main(args=None):
                 raise
 
     node.get_logger().info(f"Shutting down '{node_name}'")
+    executor_thread.join()
     node.destroy_node()
     rclpy.shutdown()
     s.close()
