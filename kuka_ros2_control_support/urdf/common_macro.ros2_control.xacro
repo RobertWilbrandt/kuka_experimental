@@ -110,7 +110,7 @@
       </xacro:if>
     </ros2_control>
 
-    <xacro:if value="$(arg sim_gazebo_classic)">
+    <xacro:if value="${sim_gazebo_classic}">
       <!-- Gazebo plugins -->
       <gazebo reference="world">
       </gazebo>
@@ -121,7 +121,7 @@
       </gazebo>
     </xacro:if>
 
-    <xacro:if value="$(arg sim_gazebo)">
+    <xacro:if value="${sim_gazebo}">
       <!-- Gazebo plugins -->
       <gazebo reference="world">
       </gazebo>
