@@ -117,6 +117,7 @@ repos:
         stages: [commit]
         entry: ament_copyright
         language: system
+        exclude: ^kuka_rsi_simulator/kuka_rsi_simulator/kuka_rsi_simulator.py
 
   # Docs - RestructuredText hooks
   - repo: https://github.com/PyCQA/doc8
